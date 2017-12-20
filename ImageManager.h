@@ -6,8 +6,23 @@ struct texture
 {
 	LPDIRECT3DTEXTURE9 lpd3dTex;
 	D3DXIMAGE_INFO info;
+};
 
-	void DrawImage(float x, float y, float angle = 0.0f, int alpha = 255.0f);
+
+struct matrix
+{
+public:
+	float width, height;
+	float x, y;
+	float velocity, direction;
+};
+
+
+struct frameData
+{
+public:
+	int wCount, hCount;
+	int wIndex, hIndex;
 };
 
 
@@ -27,8 +42,8 @@ public:
 	void ResetDevice();
 
 	texture* AddImage(LPCSTR lpPath);
-	void DrawImage(texture* pTexture, float x, float y, float angle = 0.0f, int alpha = 255.0f);
-	void DrawFrameImage(texture* pTexture, int wc, int hc, int wi, int hi, float x, float y, float angle = 0.0f, int alpha = 255.0f);
+	void DrawImage(texture* pTexture, matrix mat, int alpha = 255.0f);
+	void DrawFrameImage(texture* pTexture, frameData frame, matrix mat, int alpha = 255.0f);
 
 	ImageManager();
 	virtual ~ImageManager();

@@ -1,15 +1,6 @@
 #include "stdafx.h"
 
 
-void texture::DrawImage(float x, float y, float angle, int alpha)
-{
-	IMAGEMANAGER->DrawImage(this, x, y, angle, alpha);
-}
-
-
-//
-
-
 ImageManager::ImageManager()
 {
 	Init();
@@ -49,7 +40,7 @@ void ImageManager::End()
 
 void ImageManager::LostDevice()
 {
-	if(lpd3dSprite != nullptr)
+	if (lpd3dSprite != nullptr)
 		lpd3dSprite->OnLostDevice();
 }
 
@@ -68,7 +59,7 @@ texture* ImageManager::AddImage(LPCSTR lpPath)
 
 	D3DXCreateTextureFromFileEx(lpd3dDevice, lpPath, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &info, nullptr, &lpd3dTex);
-	
+
 	texture* dest = new texture;
 	dest->lpd3dTex = lpd3dTex;
 	dest->info = info;
@@ -77,15 +68,15 @@ texture* ImageManager::AddImage(LPCSTR lpPath)
 }
 
 
-void ImageManager::DrawImage(texture* pTexture, float x, float y, float angle, int alpha)
+void ImageManager::DrawImage(texture* pTexture, matrix mat, int alpha)
 {
 	if (pTexture)
 	{
 		D3DXMATRIX matTrans;
 		D3DXVECTOR3 Center = { (float)pTexture->info.Width / 2, (float)pTexture->info.Height / 2, 0.0f };
-		
+
 		D3DXMatrixIdentity(&matTrans);
-		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(angle), &D3DXVECTOR2(x, y));
+		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(mat.direction), &D3DXVECTOR2(mat.x, mat.y));
 		lpd3dSprite->SetTransform(&matTrans);
 
 		lpd3dSprite->Draw(pTexture->lpd3dTex, nullptr, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));
@@ -93,19 +84,24 @@ void ImageManager::DrawImage(texture* pTexture, float x, float y, float angle, i
 }
 
 
-void ImageManager::DrawFrameImage(texture* pTexture, int wc, int hc, int wi, int hi, float x, float y, float angle, int alpha)
+void ImageManager::DrawFrameImage(texture* pTexture, frameData frame, matrix mat, int alpha)
 {
 	if (pTexture)
 	{
 		float width = (float)pTexture->info.Width;
 		float height = (float)pTexture->info.Height;
 
-		RECT image = { width / wc * wi, height / hc * hi, width / wc * (wi + 1), height / hc * (hi + 1) };
+		float left = width / frame.wCount * frame.wIndex;
+		float top = height / frame.hCount * frame.hIndex;
+		float right = width / frame.wCount * (frame.wIndex + 1);
+		float bottom = height / frame.hCount * (frame.hIndex + 1);
+		RECT image = { left, top, right, bottom };
+
 		D3DXMATRIX matTrans;
-		D3DXVECTOR3 Center = { width / wc / 2, height / hc / 2, 0.0f };
+		D3DXVECTOR3 Center = { width / frame.wCount / 2, height / frame.hCount / 2, 0.0f };
 
 		D3DXMatrixIdentity(&matTrans);
-		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(angle), &D3DXVECTOR2(x, y));
+		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(mat.direction), &D3DXVECTOR2(mat.x, mat.y));
 		lpd3dSprite->SetTransform(&matTrans);
 
 		lpd3dSprite->Draw(pTexture->lpd3dTex, &image, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));

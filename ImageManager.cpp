@@ -14,13 +14,20 @@ ImageManager::~ImageManager()
 int ImageManager::Init()
 {
 	D3DXCreateSprite(lpd3dDevice, &lpd3dSprite);
-
 	return 0;
 }
 
 
 int ImageManager::Release()
 {
+	map<string, texture*>::iterator iter;
+	for (iter = mapTexture.begin(); iter != mapTexture.end(); ++iter)
+	{
+		iter->second->lpd3dTex->Release();
+		SAFE_DELETE(iter->second);
+	}
+	mapTexture.clear();
+
 	SAFE_RELEASE(lpd3dSprite);
 	return 0;
 }
@@ -52,7 +59,7 @@ void ImageManager::ResetDevice()
 }
 
 
-texture* ImageManager::AddImage(LPCSTR lpPath)
+void ImageManager::AddImage(string key, LPCSTR lpPath)
 {
 	LPDIRECT3DTEXTURE9 lpd3dTex;
 	D3DXIMAGE_INFO info;
@@ -64,32 +71,34 @@ texture* ImageManager::AddImage(LPCSTR lpPath)
 	dest->lpd3dTex = lpd3dTex;
 	dest->info = info;
 
-	return dest;
+	mapTexture.insert(make_pair(key, dest));
 }
 
 
-void ImageManager::DrawImage(texture* pTexture, matrix mat, int alpha)
+void ImageManager::DrawImage(string key, matrix mat, int alpha)
 {
-	if (pTexture)
+	texture* tex = mapTexture.find(key)->second;
+	if (tex != NULL)
 	{
 		D3DXMATRIX matTrans;
-		D3DXVECTOR3 Center = { (float)pTexture->info.Width / 2, (float)pTexture->info.Height / 2, 0.0f };
+		D3DXVECTOR3 Center = { (float)tex->info.Width / 2, (float)tex->info.Height / 2, 0.0f };
 
 		D3DXMatrixIdentity(&matTrans);
 		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(mat.direction), &D3DXVECTOR2(mat.x, mat.y));
 		lpd3dSprite->SetTransform(&matTrans);
 
-		lpd3dSprite->Draw(pTexture->lpd3dTex, nullptr, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));
+		lpd3dSprite->Draw(tex->lpd3dTex, nullptr, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));
 	}
 }
 
 
-void ImageManager::DrawFrameImage(texture* pTexture, frameData frame, matrix mat, int alpha)
+void ImageManager::DrawFrameImage(string key, frameData frame, matrix mat, int alpha)
 {
-	if (pTexture)
+	texture* tex = mapTexture.find(key)->second;
+	if (tex != NULL)
 	{
-		float width = (float)pTexture->info.Width;
-		float height = (float)pTexture->info.Height;
+		float width = (float)tex->info.Width;
+		float height = (float)tex->info.Height;
 
 		float left = width / frame.wCount * frame.wIndex;
 		float top = height / frame.hCount * frame.hIndex;
@@ -104,6 +113,6 @@ void ImageManager::DrawFrameImage(texture* pTexture, frameData frame, matrix mat
 		D3DXMatrixAffineTransformation2D(&matTrans, 1.0f, nullptr, D3DXToRadian(mat.direction), &D3DXVECTOR2(mat.x, mat.y));
 		lpd3dSprite->SetTransform(&matTrans);
 
-		lpd3dSprite->Draw(pTexture->lpd3dTex, &image, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));
+		lpd3dSprite->Draw(tex->lpd3dTex, &image, &Center, nullptr, D3DCOLOR_RGBA(0xFF, 0xFF, 0xFF, alpha));
 	}
 }

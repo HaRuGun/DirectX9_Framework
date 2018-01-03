@@ -3,8 +3,6 @@
 
 MainProc::MainProc()
 {
-	windowStyle[FULLSCREEN] = WS_POPUP | WS_MAXIMIZE;
-	windowStyle[WINDOWED] = WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX;
 }
 
 
@@ -28,6 +26,15 @@ int MainProc::Update(double deltaTime)
 	INPUTMANAGER->Update();
 	SCENEMANAGER->Update(deltaTime);
 
+	if (INPUTMANAGER->IsKeyDown('A'))
+	{
+		ChangeWindow(FULLSCREEN);
+	}
+
+	if (INPUTMANAGER->IsKeyDown('S'))
+	{
+		ChangeWindow(WINDOWED);
+	}
 	return 0;
 }
 
@@ -78,7 +85,17 @@ void MainProc::ChangeWindow(SCREEN_MODE screenMode)
 	windowMode = screenMode;
 
 	ShowWindow(hWnd, SW_HIDE);
-	SetWindowLong(hWnd, GWL_STYLE, windowStyle[windowMode]);
+
+	DWORD style = (screenMode == WINDOWED) ?
+		WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX :
+		WS_POPUP;
+	DWORD exStyle = (screenMode == FULLSCREEN) ?
+		WS_EX_APPWINDOW :
+		0;
+
+	SetWindowLongPtr(hWnd, GWL_STYLE, style);
+	SetWindowLongPtr(hWnd, GWL_EXSTYLE, exStyle);
+
 	LostDevice();
 	HRESULT hr = lpd3dDevice->Reset(&MakeD3DPP(windowMode));
 	ResetDevice();

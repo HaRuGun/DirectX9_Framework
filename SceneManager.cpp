@@ -4,6 +4,9 @@
 void SceneManager::Init()
 {
 	pCurrentScene = &sMain;
+	pNextScene = nullptr;
+	bSceneChange = false;
+
 	sMain.Init();
 }
 
@@ -17,6 +20,15 @@ void SceneManager::Release()
 void SceneManager::Update(double deltaTime)
 {
 	pCurrentScene->Update(deltaTime);
+
+	if (bSceneChange)
+	{
+		pCurrentScene->Release();
+		pCurrentScene = pNextScene;
+		pCurrentScene->Init();
+
+		bSceneChange = false;
+	}
 }
 
 
@@ -31,11 +43,11 @@ void SceneManager::Render()
 
 void SceneManager::ChageScene(Scene* pScene)
 {
-	if (pScene)
+	if (pScene != nullptr)
 	{
-		pCurrentScene->Release();
-		pCurrentScene = pScene;
-		pScene->Init();
+		pNextScene = pScene;
+		bSceneChange = true;
 	}
+
 	return;
 }

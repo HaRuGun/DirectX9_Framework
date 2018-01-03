@@ -5,6 +5,8 @@ class SceneManager : public Singleton<SceneManager>
 {
 private:
 	Scene* pCurrentScene;
+	Scene* pNextScene;
+	bool bSceneChange;
 
 	SMain sMain;
 

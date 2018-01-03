@@ -14,6 +14,7 @@
 #include <memory.h>
 #include <tchar.h>
 #include <timeapi.h>
+#include <map>
 
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "msimg32.lib")

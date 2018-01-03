@@ -1,6 +1,7 @@
 #pragma once
 #include "Singleton.h"
 
+using namespace std;
 
 struct texture
 {
@@ -30,6 +31,8 @@ class ImageManager : public Singleton<ImageManager>
 {
 private:
 	LPD3DXSPRITE lpd3dSprite;
+	
+	map<string, texture*> mapTexture;
 
 	int Init();
 	int Release();
@@ -41,9 +44,9 @@ public:
 	void LostDevice();
 	void ResetDevice();
 
-	texture* AddImage(LPCSTR lpPath);
-	void DrawImage(texture* pTexture, matrix mat, int alpha = 255.0f);
-	void DrawFrameImage(texture* pTexture, frameData frame, matrix mat, int alpha = 255.0f);
+	void AddImage(string key, LPCSTR lpPath);
+	void DrawImage(string key, matrix mat, int alpha = 255.0f);
+	void DrawFrameImage(string key, frameData frame, matrix mat, int alpha = 255.0f);
 
 	ImageManager();
 	virtual ~ImageManager();

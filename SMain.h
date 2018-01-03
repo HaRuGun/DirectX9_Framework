@@ -4,7 +4,7 @@
 class SMain : public Scene
 {
 protected:
-
+	matrix mat;
 
 public:
 

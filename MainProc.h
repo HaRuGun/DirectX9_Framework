@@ -12,8 +12,6 @@ class MainProc
 private:
 	BOOL bAct;
 
-	DWORD windowStyle[2];
-
 	SCREEN_MODE windowMode;
 
 public:

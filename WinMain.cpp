@@ -103,6 +103,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		{
 			curTime = timeGetTime();
 			deltaTime = (curTime - lastTime) * timeScale;
+
+			if (deltaTime >= 0.25f)
+				deltaTime = 0.25;
+
 			mainTime += deltaTime;
 			lastTime = curTime;
 

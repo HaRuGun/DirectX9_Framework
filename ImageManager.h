@@ -33,6 +33,7 @@ private:
 	LPD3DXSPRITE lpd3dSprite;
 	
 	map<string, texture*> mapTexture;
+	
 
 	int Init();
 	int Release();
